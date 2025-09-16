@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moshinbozor</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+    body { background: #f5f5f5; color: #333; }
+
+    header {
+      background: #1e3a8a;
+      color: white;
+      padding: 25px;
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
+
+    .filters, .add-car {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    .filters select, .filters input, .add-car input, .add-car select, .add-car button {
+      padding: 10px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-size: 16px;
+    }
+
+    .add-car button {
+      background: #1e3a8a;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .add-car button:hover { background: #3b82f6; }
+
+    .cars {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover { transform: translateY(-5px); }
+
+    .card img { width: 100%; height: 180px; object-fit: cover; }
+
+    .card-body { padding: 15px; }
+    .card-body h3 { font-size: 20px; margin-bottom: 10px; }
+    .card-body p { font-size: 16px; margin-bottom: 5px; }
+    .card-body .btn {
+      display: inline-block; padding: 8px 12px;
+      background: #1e3a8a; color: white;
+      border-radius: 6px; text-decoration: none;
+      transition: background 0.2s;
+    }
+    .card-body .btn:hover { background: #3b82f6; }
+  </style>
+</head>
+<body>
+
+  <header>Moshinbozor</header>
+
+  <div class="container">
+
+    <!-- Фильтры -->
+    <div class="filters">
+      <select id="brandFilter">
+        <option value="">Марка</option>
+        <option value="BMW">BMW</option>
+        <option value="Mercedes">Mercedes</option>
+        <option value="Toyota">Toyota</option>
+        <option value="Hyundai">Hyundai</option>
+      </select>
+
+      <select id="yearFilter">
+        <option value="">Год</option>
+        <option value="2023">2023</option>
+        <option value="2022">2022</option>
+        <option value="2021">2021</option>
+        <option value="2020">2020</option>
+      </select>
+
+      <input type="number" id="priceFilter" placeholder="Макс. цена ($)">
+    </div>
+
+    <!-- Добавить объявление -->
+    <div class="add-car">
+      <h3>Добавить своё авто</h3>
+      <input type="text" id="newBrand" placeholder="Марка" required>
+      <input type="text" id="newModel" placeholder="Модель" required>
+      <input type="number" id="newYear" placeholder="Год" required>
+      <input type="number" id="newPrice" placeholder="Цена ($)" required>
+      <input type="text" id="newImg" placeholder="Ссылка на фото" required>
+      <button id="addCarBtn">Добавить</button>
+    </div>
+
+    <!-- Список авто -->
+    <div class="cars" id="carList"></div>
+  </div>
+
+  <script>
+    const cars = [
+      { brand: "BMW", model: "X5", year: 2022, price: 55000, img: "https://images.unsplash.com/photo-1616783025580-197b3c7f2d43" },
+      { brand: "Mercedes", model: "E-Class", year: 2021, price: 48000, img: "https://images.unsplash.com/photo-1617854818583-09e7f32fbb7f" },
+      { brand: "Toyota", model: "Camry", year: 2023, price: 30000, img: "https://images.unsplash.com/photo-1619767886558-efdc1f7fa8c0" },
+      { brand: "Hyundai", model: "Sonata", year: 2020, price: 22000, img: "https://images.unsplash.com/photo-1627454822260-2c51d9b4195f" }
+    ];
+
+    const carList = document.getElementById("carList");
+    const brandFilter = document.getElementById("brandFilter");
+    const yearFilter = document.getElementById("yearFilter");
+    const priceFilter = document.getElementById("priceFilter");
+
+    function renderCars(list) {
+      carList.innerHTML = "";
+      list.forEach(car => {
+        const card = document.createElement("div");
+        card.classList.add("card");
+        card.innerHTML = `
+          <img src="${car.img}" alt="${car.brand} ${car.model}">
+          <div class="card-body">
+            <h3>${car.brand} ${car.model}</h3>
+            <p>Год: ${car.year}</p>
+            <p>Цена: $${car.price}</p>
+            <a href="#" class="btn">Подробнее</a>
+          </div>
+        `;
+        carList.appendChild(card);
+      });
+    }
+
+    function filterCars() {
+      let filtered = cars;
+      const brand = brandFilter.value;
+      const year = yearFilter.value;
+      const price = priceFilter.value;
+
+      if (brand) filtered = filtered.filter(car => car.brand === brand);
+      if (year) filtered = filtered.filter(car => car.year == year);
+      if (price) filtered = filtered.filter(car => car.price <= price);
+
+      renderCars(filtered);
+    }
+
+    brandFilter.addEventListener("change", filterCars);
+    yearFilter.addEventListener("change", filterCars);
+    priceFilter.addEventListener("input", filterCars);
+
+    // Добавление нового авто
+    document.getElementById("addCarBtn").addEventListener("click", () => {
+      const newCar = {
+        brand: document.getElementById("newBrand").value,
+        model: document.getElementById("newModel").value,
+        year: parseInt(document.getElementById("newYear").value),
+        price: parseInt(document.getElementById("newPrice").value),
+        img: document.getElementById("newImg").value
+      };
+      cars.push(newCar);
+      renderCars(cars);
+
+      document.getElementById("newBrand").value = "";
+      document.getElementById("newModel").value = "";
+      document.getElementById("newYear").value = "";
+      document.getElementById("newPrice").value = "";
+      document.getElementById("newImg").value = "";
+    });
+
+    renderCars(cars);
+  </script>
+
+</body>
+</html>
